@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +15,16 @@ import java.util.NoSuchElementException;
 public class ItemServiceImpl implements ItemService {
 
     private final Map<Long, Item> items = new HashMap<>();
+    private final UserService userService;
     private long nextId = 1;
+
+    public ItemServiceImpl(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public ItemDto create(Long userId, ItemDto dto) {
+        userService.getById(userId); // 🔴 проверка существования пользователя
         validateItem(dto);
 
         Item item = ItemMapper.toItem(dto, userId);
