@@ -5,7 +5,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -15,25 +18,34 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(Long userId, ItemDto dto) {
+        validateItem(dto);
+
         Item item = ItemMapper.toItem(dto, userId);
         item.setId(nextId++);
         items.put(item.getId(), item);
+
         return ItemMapper.toDto(item);
     }
 
     @Override
     public ItemDto update(Long userId, Long itemId, ItemDto dto) {
         Item item = items.get(itemId);
+        if (item == null) {
+            throw new NoSuchElementException("Item not found");
+        }
+
         if (!item.getOwnerId().equals(userId)) {
-            throw new RuntimeException("Редактировать может только владелец");
+            throw new NoSuchElementException("Not owner");
         }
 
         if (dto.getName() != null) {
             item.setName(dto.getName());
         }
+
         if (dto.getDescription() != null) {
             item.setDescription(dto.getDescription());
         }
+
         if (dto.getAvailable() != null) {
             item.setAvailable(dto.getAvailable());
         }
@@ -43,7 +55,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getById(Long itemId) {
-        return ItemMapper.toDto(items.get(itemId));
+        Item item = items.get(itemId);
+        if (item == null) {
+            throw new NoSuchElementException("Item not found");
+        }
+        return ItemMapper.toDto(item);
     }
 
     @Override
@@ -60,14 +76,29 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        String lower = text.toLowerCase();
+        String query = text.toLowerCase();
 
         return items.values().stream()
                 .filter(Item::getAvailable)
                 .filter(item ->
-                        item.getName().toLowerCase().contains(lower) ||
-                                item.getDescription().toLowerCase().contains(lower))
+                        item.getName().toLowerCase().contains(query)
+                                || item.getDescription().toLowerCase().contains(query)
+                )
                 .map(ItemMapper::toDto)
                 .toList();
+    }
+
+    private void validateItem(ItemDto dto) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new IllegalArgumentException("Item name is empty");
+        }
+
+        if (dto.getDescription() == null || dto.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Item description is empty");
+        }
+
+        if (dto.getAvailable() == null) {
+            throw new IllegalArgumentException("Available must be specified");
+        }
     }
 }
