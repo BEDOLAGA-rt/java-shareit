@@ -2,7 +2,6 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ru.practicum</groupId>
@@ -11,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>ShareIt</name>
-	<description>ShareIt application for Practicum</description>
+	<description>ShareIt Project - Spring Boot</description>
 
 	<properties>
 		<java.version>23</java.version>
@@ -20,21 +19,26 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
-		<!-- Spring Boot Web -->
+		<!-- Spring Boot Starter Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Spring Data JPA -->
+		<!-- Spring Boot Starter Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -47,14 +51,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Lombok (опционально, для удобства) -->
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Тестирование -->
+		<!-- Spring Boot Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -68,9 +72,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
 			</plugin>
 
-			<!-- Maven Compiler -->
+			<!-- Maven Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -81,24 +86,31 @@
 				</configuration>
 			</plugin>
 
-			<!-- Maven Enforcer (для CI) -->
+			<!-- Maven Enforcer Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<version>3.4.1</version>
 				<executions>
 					<execution>
-						<id>enforce-maven</id>
+						<id>enforce-java</id>
 						<goals>
 							<goal>enforce</goal>
 						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>[23,)</version>
+									<message>Java 23 or higher is required</message>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
 
-	<!-- Профиль check для GitHub Actions -->
 	<profiles>
 		<profile>
 			<id>check</id>
@@ -106,14 +118,21 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>3.3.1</version>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<version>3.4.1</version>
 						<executions>
 							<execution>
-								<phase>validate</phase>
+								<id>enforce-maven</id>
 								<goals>
-									<goal>check</goal>
+									<goal>enforce</goal>
 								</goals>
+								<configuration>
+									<rules>
+										<requireJavaVersion>
+											<version>[23,)</version>
+										</requireJavaVersion>
+									</rules>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
