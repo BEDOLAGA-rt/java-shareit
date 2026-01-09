@@ -1,8 +1,10 @@
 package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
@@ -13,9 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
-    private Long id;
-
+public class BookingCreateDto {
     @NotNull(message = "Дата начала не может быть пустой")
     @FutureOrPresent(message = "Дата начала должна быть в будущем или настоящем")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -28,29 +28,4 @@ public class BookingDto {
 
     @NotNull(message = "ID вещи не может быть пустым")
     private Long itemId;
-
-    private Long bookerId;
-    private BookingStatus status;
-
-    // Добавьте эти поля
-    private ItemDto item;
-    private BookerDto booker;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ItemDto {
-        private Long id;
-        private String name;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BookerDto {
-        private Long id;
-        private String name;
-    }
 }

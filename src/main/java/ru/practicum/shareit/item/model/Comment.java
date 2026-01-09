@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import ru.practicum.shareit.item.model.Item;
@@ -7,38 +7,36 @@ import ru.practicum.shareit.user.User;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "requests")
+@Table(name = "comments")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemRequest {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Описание запроса не может быть пустым")
-    @Column(name = "description", nullable = false, length = 2000)
-    private String description;
+    @NotBlank(message = "Текст комментария не может быть пустым")
+    @Column(name = "text", nullable = false, length = 2000)
+    private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id", nullable = false)
+    @JoinColumn(name = "item_id", nullable = false)
     @ToString.Exclude
-    private User requester;
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
+    private User author;
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
-
-    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @Builder.Default
-    private List<Item> items = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -48,8 +46,8 @@ public class ItemRequest {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ItemRequest)) return false;
-        return id != null && id.equals(((ItemRequest) o).getId());
+        if (!(o instanceof Comment)) return false;
+        return id != null && id.equals(((Comment) o).getId());
     }
 
     @Override

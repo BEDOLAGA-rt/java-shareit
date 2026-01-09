@@ -1,18 +1,45 @@
 package ru.practicum.shareit.user.service;
 
+import ru.practicum.shareit.user.dto.UserCreateDto;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
+
 import java.util.List;
 
 public interface UserService {
 
-    UserDto create(UserDto userDto);
+    /**
+     * Создание нового пользователя
+     */
+    UserDto createUser(UserCreateDto userCreateDto);
 
-    UserDto update(Long id, UserDto userDto);
+    /**
+     * Обновление существующего пользователя
+     */
+    UserDto updateUser(Long userId, UserUpdateDto userUpdateDto);
 
-    UserDto getById(Long id);
+    /**
+     * Получение пользователя по ID
+     */
+    UserDto getUserById(Long userId);
 
-    List<UserDto> getAll();
+    /**
+     * Получение всех пользователей
+     */
+    List<UserDto> getAllUsers();
 
-    void delete(Long id);
+    /**
+     * Удаление пользователя по ID
+     */
+    void deleteUser(Long userId);
 
+    /**
+     * Проверка существования пользователя
+     */
+    boolean existsById(Long userId);
+
+    /**
+     * Получение пользователя по email
+     */
+    UserDto getUserByEmail(String email);
 }

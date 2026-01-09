@@ -1,64 +1,65 @@
 package ru.practicum.shareit.item.model;
 
-import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.User;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "items")
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Item {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Название не может быть пустым")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Описание не может быть пустым")
+    @Column(name = "description", nullable = false, length = 1000)
     private String description;
 
-    @Column(nullable = false)
+    @NotNull(message = "Статус доступности не может быть null")
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
 
-    @Column(name = "owner_id", nullable = false)
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    @ToString.Exclude
+    private User owner;
 
-    public Long getId() {
-        return id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id")
+    @ToString.Exclude
+    private ItemRequest request;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+        return id != null && id.equals(((Item) o).getId());
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getAvailable() {
-        return available;
-    }
-
-    public void setAvailable(Boolean available) {
-        this.available = available;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
