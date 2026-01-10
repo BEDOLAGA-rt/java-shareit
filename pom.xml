@@ -102,29 +102,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Добавлено: maven-enforcer-plugin с правильной конфигурацией -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.4.1</version>
-				<executions>
-					<execution>
-						<id>enforce</id>
-						<configuration>
-							<rules>
-								<!-- Проверка существования профиля 'check' -->
-								<requireProfileIdsExist>
-									<profiles>check</profiles>
-								</requireProfileIdsExist>
-							</rules>
-							<fail>false</fail> <!-- Не останавливать сборку при ошибке -->
-						</configuration>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!-- Убрал enforcer-plugin из основного билда, добавил его в профиль check -->
 
 			<!-- Добавлено: compiler-plugin для работы с Lombok и Java 17 -->
 			<plugin>
@@ -281,6 +259,27 @@
 					<plugin>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<version>3.4.1</version>
+						<executions>
+							<execution>
+								<id>enforce</id>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<!-- Используем правильное название параметра -->
+										<requireProfileIdsExist>
+											<profileIds>check</profileIds>
+										</requireProfileIdsExist>
+									</rules>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
