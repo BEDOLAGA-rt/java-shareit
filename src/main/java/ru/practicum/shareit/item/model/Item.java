@@ -1,60 +1,42 @@
 package ru.practicum.shareit.item.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.shareit.user.User;
+
+import java.util.List;
+
+@Entity
+@Table(name = "items")
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Item {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
-    private Long ownerId;
 
-    public Item() {
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    @ToString.Exclude
+    private User owner;
 
-    public Item(Long id, String name, String description, Boolean available, Long ownerId) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.ownerId = ownerId;
-    }
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Boolean getAvailable() {
-        return available;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setAvailable(Boolean available) {
-        this.available = available;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
+    @Column(name = "request_id")
+    private Long requestId;
 }
