@@ -35,10 +35,6 @@ import static java.time.LocalDateTime.*;
 import static java.util.Collections.*;
 import static java.util.Comparator.*;
 
-/**
- * @author Oleg Khilko
- */
-
 @Slf4j
 @Service
 @AllArgsConstructor
