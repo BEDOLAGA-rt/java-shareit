@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -57,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = getItemOrThrow(itemId);
 
         if (!item.getOwner().getId().equals(userId)) {
-            throw new NotFoundException("User is not the owner of the item");
+            throw new ForbiddenException("User is not the owner of the item");
         }
 
         if (itemDto.getName() != null && !itemDto.getName().isBlank()) {

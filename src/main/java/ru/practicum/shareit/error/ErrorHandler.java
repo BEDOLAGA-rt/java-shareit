@@ -6,9 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.ConflictException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.*;
 
 import java.util.Map;
 
@@ -20,6 +18,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(RuntimeException e) {
         log.error("Not found error: {}", e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleForbidden(RuntimeException e) {
+        log.error("Forbidden error: {}", e.getMessage());
         return Map.of("error", e.getMessage());
     }
 
