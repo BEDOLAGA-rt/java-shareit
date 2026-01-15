@@ -23,7 +23,7 @@ public class BaseClient {
         return get(path, userId, null);
     }
 
-    protected ResponseEntity<Object> get(String path, Long userId, @Nullable Map<String, Object> parameters) {
+    protected ResponseEntity<Object> get(String path, @Nullable Long userId, @Nullable Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, null);
     }
 
@@ -35,7 +35,7 @@ public class BaseClient {
         return post(path, userId, null, body);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> post(String path, @Nullable Long userId, @Nullable Map<String, Object> parameters, T body) {
         return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body);
     }
 
@@ -43,32 +43,24 @@ public class BaseClient {
         return put(path, userId, null, body);
     }
 
-    protected <T> ResponseEntity<Object> put(String path, long userId, @Nullable Map<String, Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> put(String path, @Nullable Long userId, @Nullable Map<String, Object> parameters, T body) {
         return makeAndSendRequest(HttpMethod.PUT, path, userId, parameters, body);
     }
 
-    // Метод для PATCH без userId и тела
-    protected ResponseEntity<Object> patch(String path) {
+    // Упрощенный patch метод
+    protected <T> ResponseEntity<Object> patch(String path) {
         return patch(path, (Long) null, null, null);
     }
 
-    // Метод для PATCH с userId без тела
-    protected ResponseEntity<Object> patch(String path, long userId) {
-        return patch(path, userId, null, null);
-    }
-
-    // Метод для PATCH с телом, но без userId
     protected <T> ResponseEntity<Object> patch(String path, T body) {
-        return makeAndSendRequest(HttpMethod.PATCH, path, null, null, body);
+        return patch(path, null, null, body);
     }
 
-    // Метод для PATCH с userId и телом
     protected <T> ResponseEntity<Object> patch(String path, long userId, T body) {
-        return makeAndSendRequest(HttpMethod.PATCH, path, userId, null, body);
+        return patch(path, userId, null, body);
     }
 
-    // Метод для PATCH с userId, параметрами и телом
-    protected <T> ResponseEntity<Object> patch(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> patch(String path, @Nullable Long userId, @Nullable Map<String, Object> parameters, T body) {
         return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body);
     }
 
@@ -80,11 +72,11 @@ public class BaseClient {
         return delete(path, userId, null);
     }
 
-    protected ResponseEntity<Object> delete(String path, Long userId, @Nullable Map<String, Object> parameters) {
+    protected ResponseEntity<Object> delete(String path, @Nullable Long userId, @Nullable Map<String, Object> parameters) {
         return makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Long userId,
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Long userId,
                                                           @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
 
@@ -101,7 +93,7 @@ public class BaseClient {
         return prepareGatewayResponse(shareitServerResponse);
     }
 
-    private HttpHeaders defaultHeaders(Long userId) {
+    private HttpHeaders defaultHeaders(@Nullable Long userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));

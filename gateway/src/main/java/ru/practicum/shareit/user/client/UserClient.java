@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.client;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 public class UserClient extends BaseClient {
     private static final String API_PREFIX = "/users";
 
-    @Autowired
     public UserClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
@@ -27,12 +26,11 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateUser(Long userId, UserDto userDto) {
-        // Явно указываем, что используем метод с userId и body
-        return patch("/" + userId, userDto);
+        return patch("/" + userId, userId, userDto); // Исправлено: передаем userId первым параметром
     }
 
     public ResponseEntity<Object> getUserById(Long userId) {
-        return get("/" + userId);
+        return get("/" + userId, userId);
     }
 
     public ResponseEntity<Object> getAllUsers() {
@@ -40,6 +38,6 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> deleteUser(Long userId) {
-        return delete("/" + userId);
+        return delete("/" + userId, userId);
     }
 }
