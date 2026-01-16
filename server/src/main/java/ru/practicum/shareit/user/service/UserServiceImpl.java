@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -28,14 +28,14 @@ public class UserServiceImpl implements UserService {
             // Проверяем уникальность email перед сохранением
             userRepository.findByEmail(userDto.getEmail())
                     .ifPresent(u -> {
-                        throw new BadRequestException("Пользователь с email " + userDto.getEmail() + " уже существует");
+                        throw new ConflictException("Пользователь с email " + userDto.getEmail() + " уже существует");
                     });
 
             User user = userMapper.toUser(userDto);
             User savedUser = userRepository.save(user);
             return userMapper.toUserDto(savedUser);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Пользователь с таким email уже существует");
+            throw new ConflictException("Пользователь с таким email уже существует");
         }
     }
 
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
             userRepository.findByEmail(userDto.getEmail())
                     .ifPresent(user -> {
                         if (!user.getId().equals(userId)) {
-                            throw new BadRequestException("Пользователь с email " + userDto.getEmail() + " уже существует");
+                            throw new ConflictException("Пользователь с email " + userDto.getEmail() + " уже существует");
                         }
                     });
             existingUser.setEmail(userDto.getEmail());
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             User updatedUser = userRepository.save(existingUser);
             return userMapper.toUserDto(updatedUser);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Пользователь с таким email уже существует");
+            throw new ConflictException("Пользователь с таким email уже существует");
         }
     }
 
