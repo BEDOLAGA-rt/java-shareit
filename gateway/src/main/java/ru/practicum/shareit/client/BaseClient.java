@@ -47,27 +47,22 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.PUT, path, userId, parameters, body);
     }
 
-    // Метод для PATCH без userId и тела
     protected ResponseEntity<Object> patch(String path) {
-        return patch(path, (Long) null, null, null);
+        return patch(path, null, null, null);
     }
 
-    // Метод для PATCH с userId без тела
     protected ResponseEntity<Object> patch(String path, long userId) {
         return patch(path, userId, null, null);
     }
 
-    // Метод для PATCH с телом, но без userId
     protected <T> ResponseEntity<Object> patch(String path, T body) {
         return makeAndSendRequest(HttpMethod.PATCH, path, null, null, body);
     }
 
-    // Метод для PATCH с userId и телом
     protected <T> ResponseEntity<Object> patch(String path, long userId, T body) {
         return makeAndSendRequest(HttpMethod.PATCH, path, userId, null, body);
     }
 
-    // Метод для PATCH с userId, параметрами и телом
     protected <T> ResponseEntity<Object> patch(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
         return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body);
     }
@@ -90,7 +85,7 @@ public class BaseClient {
 
         ResponseEntity<Object> shareitServerResponse;
         try {
-            if (parameters != null) {
+            if (parameters != null && !parameters.isEmpty()) {
                 shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
             } else {
                 shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class);

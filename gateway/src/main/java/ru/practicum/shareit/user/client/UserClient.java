@@ -27,7 +27,6 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateUser(Long userId, UserDto userDto) {
-        // Явно указываем, что используем метод с userId и body
         return patch("/" + userId, userDto);
     }
 

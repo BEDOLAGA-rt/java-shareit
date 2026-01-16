@@ -1,8 +1,10 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -22,9 +24,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        User user = userMapper.toUser(userDto);
-        User savedUser = userRepository.save(user);
-        return userMapper.toUserDto(savedUser);
+        try {
+            // Проверяем уникальность email перед сохранением
+            userRepository.findByEmail(userDto.getEmail())
+                    .ifPresent(u -> {
+                        throw new BadRequestException("Пользователь с email " + userDto.getEmail() + " уже существует");
+                    });
+
+            User user = userMapper.toUser(userDto);
+            User savedUser = userRepository.save(user);
+            return userMapper.toUserDto(savedUser);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Пользователь с таким email уже существует");
+        }
     }
 
     @Override
@@ -33,16 +45,27 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не найден"));
 
-        if (userDto.getName() != null) {
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
             existingUser.setName(userDto.getName());
         }
 
-        if (userDto.getEmail() != null) {
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            // Проверяем, что новый email не занят другим пользователем
+            userRepository.findByEmail(userDto.getEmail())
+                    .ifPresent(user -> {
+                        if (!user.getId().equals(userId)) {
+                            throw new BadRequestException("Пользователь с email " + userDto.getEmail() + " уже существует");
+                        }
+                    });
             existingUser.setEmail(userDto.getEmail());
         }
 
-        User updatedUser = userRepository.save(existingUser);
-        return userMapper.toUserDto(updatedUser);
+        try {
+            User updatedUser = userRepository.save(existingUser);
+            return userMapper.toUserDto(updatedUser);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Пользователь с таким email уже существует");
+        }
     }
 
     @Override

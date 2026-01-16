@@ -27,7 +27,7 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> updateUser(
             @PathVariable Long userId,
-            @Valid @RequestBody UserDto userDto) {
+            @RequestBody UserDto userDto) {  // Убрали @Valid, чтобы принимать частичные обновления
         log.info("Updating user with id {}: {}", userId, userDto);
         return userClient.updateUser(userId, userDto);
     }
