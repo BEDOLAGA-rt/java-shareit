@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.client.UserClient;
+import ru.practicum.shareit.user.dto.UserCreateDto;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 
 import jakarta.validation.Valid;
 
@@ -19,16 +21,26 @@ public class UserController {
     private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto) {
-        log.info("Creating user: {}", userDto);
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
+        log.info("Creating user: {}", userCreateDto);
+        // Преобразуем UserCreateDto в UserDto для отправки на сервер
+        UserDto userDto = UserDto.builder()
+                .name(userCreateDto.getName())
+                .email(userCreateDto.getEmail())
+                .build();
         return userClient.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> updateUser(
             @PathVariable Long userId,
-            @RequestBody UserDto userDto) {  // Убрали @Valid, чтобы принимать частичные обновления
-        log.info("Updating user with id {}: {}", userId, userDto);
+            @Valid @RequestBody UserUpdateDto userUpdateDto) {
+        log.info("Updating user with id {}: {}", userId, userUpdateDto);
+        // Преобразуем UserUpdateDto в UserDto для отправки на сервер
+        UserDto userDto = UserDto.builder()
+                .name(userUpdateDto.getName())
+                .email(userUpdateDto.getEmail())
+                .build();
         return userClient.updateUser(userId, userDto);
     }
 

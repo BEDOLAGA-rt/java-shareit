@@ -24,14 +24,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        try {
-            // Проверяем уникальность email перед сохранением
-            userRepository.findByEmail(userDto.getEmail())
-                    .ifPresent(u -> {
-                        throw new ConflictException("Пользователь с email " + userDto.getEmail() + " уже существует");
-                    });
+        // Проверяем уникальность email перед сохранением
+        userRepository.findByEmail(userDto.getEmail())
+                .ifPresent(u -> {
+                    throw new ConflictException("Пользователь с email " + userDto.getEmail() + " уже существует");
+                });
 
-            User user = userMapper.toUser(userDto);
+        User user = userMapper.toUser(userDto);
+
+        // Оставляем только один try-catch на случай конкурентного доступа
+        try {
             User savedUser = userRepository.save(user);
             return userMapper.toUserDto(savedUser);
         } catch (DataIntegrityViolationException e) {
